@@ -31,9 +31,9 @@ will be uploaded soon.
 
 
 ## Technologies Used
-Frontend Development: HTML, CSS, JavaScript.
-Backend Development: ASP.NET, C#.
-Database Management: SQL Server.
+- Frontend Development: HTML, CSS, JavaScript.
+- Backend Development: ASP.NET, C#.
+- Database Management: SQL Server.
 
 ## License
 CRUD Board is licensed under the MIT License.
