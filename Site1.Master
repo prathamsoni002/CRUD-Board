@@ -1,0 +1,132 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site1.master.cs" Inherits="Resume_Project_CRUD_Board.Site1"  %>
+
+
+<!DOCTYPE html>
+
+<html>
+<head runat="server">
+    <title>CRUD Board</title>
+    <%--Bootstrap Css --%>
+    <link href="bootstrap/CSS%20-%20Bootstrap/cdn.jsdelivr.net_npm_bootstrap@5.3.0_dist_css_bootstrap.min.css" rel="stylesheet" />
+    
+    <%--databales css --%>
+    <link href="datatables/css/cdn.datatables.net_1.13.4_css_jquery.dataTables.min.css" rel="stylesheet" />
+    <%-- fontawesome css --%>
+    <link href="Fontawesome/fontawesome-free-6.4.0-web/css/all.css" rel="stylesheet" />
+
+    <%-- JQuery --%>
+    <script src="bootstrap/js/code.jquery.com_jquery-3.3.1.slim.min.js"></script>
+     <%--Popper file (for bootstrap to work) --%>
+    <script src="bootstrap/js/cdn.jsdelivr.net_npm_popper.js@1.14.7_dist_umd_popper.min.js"></script>
+     <%--Java script --%>
+    <script src="bootstrap/js/cdn.jsdelivr.net_npm_bootstrap@5.3.0_dist_js_bootstrap.bundle.min.js"></script>
+     <%--our custom css--%>
+    <link href="css/customstylesheet.css" rel="stylesheet" />
+     <%--Custom Java script 
+         <script language="javascript" src="scriptLibrary.js" type="text/javascript"></script>
+
+          
+     
+         
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="js/Custom.js"></script>--%>
+    
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+        
+        <div>
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <a class ="navbar-brand" href="#">
+                    <img src="imgs/crud%20nav%20bar.png" width ="100" height="55" />
+                    CRUD Board
+                </a>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                  <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                      <a class="nav-link active" aria-current="page" href="homepage.aspx">Home</a>
+                    </li>
+                    <li class="nav-item">
+                      <asp:LinkButton class="nav-link active"  ID="LinkButton6b" runat="server" OnClick="LinkButton6_Click" >Login</asp:LinkButton>
+                    </li>
+                    <li class="nav-item">
+                    <asp:LinkButton class="nav-link active"  ID="LinkButton11b" runat="server" OnClick="LinkButton11_Click" >Register</asp:LinkButton>
+                    </li>
+                    <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        About
+                      </a>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Documentation</a></li>
+                        <li><a class="dropdown-item" href="#">Whatch Intro Video</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">About Project Owner</a></li>
+                      </ul>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link disabled">Subscription</a>
+                    </li>
+                  </ul>
+                <%--   <form class="d-flex" role="search"> --%>
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                  <%--</form>--%>
+                </div>
+            </nav>
+        </div>
+
+        <div>
+            <%-- Main Content Placeholder --%>
+
+                    <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server"> 
+                    </asp:ContentPlaceHolder>
+
+        </div> 
+        <%-- Main Content Placeholder" 
+            OnClientMouseOver="changeColor(this, 'blue');" OnClientMouseOut="changeColor(this, 'inherit')" 
+            --%>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div id="footer1" class="container-fluid">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 text-center">
+                        <p>
+                            
+                            <asp:LinkButton class="footerlinks" ID="LinkButton6" runat="server" OnClick="LinkButton6_Click" >Login</asp:LinkButton>
+                            &nbsp;
+                            <asp:LinkButton class="footerlinks" ID="LinkButton11" runat="server" OnClick="LinkButton11_Click" >Register</asp:LinkButton>
+                            &nbsp;
+                            <asp:LinkButton class="footerlinks" ID="LinkButton12" runat="server"><a href="registration.aspx"  style="text-decoration: none; color: inherit;" onmouseover="this.style.color='blue';" onmouseout="this.style.color='inherit';">Feedback</a></asp:LinkButton>
+                            &nbsp;
+                            <asp:LinkButton class="footerlinks" ID="LinkButton8" runat="server" OnClientClick="window.scrollTo(0, 0); return false;" >Go to top</asp:LinkButton>
+
+                            &nbsp;
+                            <asp:LinkButton class="footerlinks" ID="LinkButton9" runat="server"><a href="#"  style="text-decoration: none; color: inherit;" onmouseover="this.style.color='blue';" onmouseout="this.style.color='inherit';">About</a></asp:LinkButton>
+                            &nbsp;
+                                
+                        </p>
+
+                    </div>
+
+                </div>
+            </div>
+            <div id="footer2" class="container-fluid">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 text-center">
+                        <p style="color:whitesmoke">&copy All right Reversed. <a href="homepage.aspx"  style="text-decoration: none; color: inherit;" onmouseover="this.style.color='blue';" onmouseout="this.style.color='inherit';">CRUD Board</a></p>
+                    </div>
+                </div>
+            </div>
+
+        </footer>
+        <!-- ./Footer -->
+
+
+
+    </form>
+</body>
+</html>
