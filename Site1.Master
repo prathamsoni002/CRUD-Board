@@ -20,6 +20,9 @@
     <script src="bootstrap/js/cdn.jsdelivr.net_npm_popper.js@1.14.7_dist_umd_popper.min.js"></script>
      <%--Java script --%>
     <script src="bootstrap/js/cdn.jsdelivr.net_npm_bootstrap@5.3.0_dist_js_bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+
+<!-- Add this script at the end of your <body> tag -->
      <%--our custom css--%>
     <link href="css/customstylesheet.css" rel="stylesheet" />
      <%--Custom Java script 
@@ -38,16 +41,16 @@
     <form id="form1" runat="server">
         
         <div>
-            <nav class="navbar navbar-expand-lg navbar-light">
-                <a class ="navbar-brand" href="#">
-                    <img src="imgs/crud%20nav%20bar.png" width ="100" height="55" />
+            <nav class="navbar navbar-expand-lg navbar-light navtext">
+                <a class ="navbar-brand"  href="#">
+                    <img src="imgs/crud%20nav%20bar.png" width ="60" height="55" />
                     CRUD Board
                 </a>
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                  <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  <ul class="navbar-nav me-auto mb-2 mb-lg-0" >
                     <li class="nav-item">
-                      <a class="nav-link active" aria-current="page" href="homepage.aspx">Home</a>
+                      <a class="nav-link active" aria-current="page" href="homepage.aspx" id="nav-home">Home</a>
                     </li>
                     <li class="nav-item">
                       <asp:LinkButton class="nav-link active"  ID="LinkButton6b" runat="server" OnClick="LinkButton6_Click" >Login</asp:LinkButton>
@@ -67,7 +70,7 @@
                       </ul>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link disabled">Subscription</a>
+                      <a class="nav-link disabled" id="nav-subs">Subscription</a>
                     </li>
                   </ul>
                 <%--   <form class="d-flex" role="search"> --%>
@@ -100,12 +103,12 @@
                             &nbsp;
                             <asp:LinkButton class="footerlinks" ID="LinkButton11" runat="server" OnClick="LinkButton11_Click" >Register</asp:LinkButton>
                             &nbsp;
-                            <asp:LinkButton class="footerlinks" ID="LinkButton12" runat="server"><a href="registration.aspx"  style="text-decoration: none; color: inherit;" onmouseover="this.style.color='blue';" onmouseout="this.style.color='inherit';">Feedback</a></asp:LinkButton>
+                            <asp:LinkButton class="footerlinks" ID="LinkButton12" runat="server"><a href="registration.aspx" class="footerlinks"  >Feedback</a></asp:LinkButton>
                             &nbsp;
                             <asp:LinkButton class="footerlinks" ID="LinkButton8" runat="server" OnClientClick="window.scrollTo(0, 0); return false;" >Go to top</asp:LinkButton>
 
                             &nbsp;
-                            <asp:LinkButton class="footerlinks" ID="LinkButton9" runat="server"><a href="#"  style="text-decoration: none; color: inherit;" onmouseover="this.style.color='blue';" onmouseout="this.style.color='inherit';">About</a></asp:LinkButton>
+                            <asp:LinkButton class="footerlinks" ID="LinkButton9" runat="server"><a href="#"  class="footerlinks"   >About</a></asp:LinkButton>
                             &nbsp;
                                 
                         </p>
@@ -117,7 +120,7 @@
             <div id="footer2" class="container-fluid">
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12 text-center">
-                        <p style="color:whitesmoke">&copy All right Reversed. <a href="homepage.aspx"  style="text-decoration: none; color: inherit;" onmouseover="this.style.color='blue';" onmouseout="this.style.color='inherit';">CRUD Board</a></p>
+                        <p style="color:whitesmoke">&copy All right Reversed. <a href="homepage.aspx"  style="text-decoration: none; color: inherit;" onmouseover="this.style.color='#dde0e4';" onmouseout="this.style.color='inherit';">CRUD Board</a></p>
                     </div>
                 </div>
             </div>

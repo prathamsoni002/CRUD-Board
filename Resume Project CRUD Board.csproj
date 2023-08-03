@@ -2139,12 +2139,16 @@
     <Content Include="Fontawesome\fontawesome-free-6.4.0-web\svgs\solid\yin-yang.svg" />
     <Content Include="Fontawesome\fontawesome-free-6.4.0-web\svgs\solid\z.svg" />
     <Content Include="homepage.aspx" />
+    <Content Include="imgs\4 cute robots chatting each other on computer.jpg" />
     <Content Include="imgs\back icon.png" />
     <Content Include="imgs\communication.jpeg" />
     <Content Include="imgs\crud nav bar.png" />
+    <Content Include="imgs\CRUD-logo.png" />
+    <Content Include="imgs\cute robot typing in computer realistc. Show the c.jpg" />
     <Content Include="imgs\delete icon.png" />
     <Content Include="imgs\login image.png" />
     <Content Include="imgs\regristration-removebg-preview.png" />
+    <Content Include="imgs\robot standing with a pencil in hand.jpg" />
     <Content Include="imgs\task completion.jpeg" />
     <Content Include="imgs\time management clock.jpeg" />
     <Content Include="imgs\trash-solid.svg" />
