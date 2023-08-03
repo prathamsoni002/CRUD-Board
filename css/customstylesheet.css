@@ -21,13 +21,13 @@ nav.navbar > a, #nav-home, #nav-subs, .nav-item > a, #LinkButton6b, #LinkButton1
 }
 
 .footerlinks {
-    color: #8db9e2;
+    color: white;
     text-decoration: none !important;
+    &:hover{
+               color: #dde0e4;
+           }
 }
 
-.footerlinks:hover {
-    color: #dde0e4;
-}
 
 #footer1 {
     background: #3538a7;
@@ -50,10 +50,14 @@ header {
 }
 
 .logo-container img {
-    width: 100px;
-    height: auto;
+    width: 950px;
+    height: 90vh;
 }
 
+.vl {
+    border-left: 0.5px solid black;
+    height: 500px;
+}
 #crud-title {
     font-size: 48px;
     font-weight: bold;
@@ -76,22 +80,31 @@ section {
     padding: 20px;
 }
 
-    .content-container h2 {
-        font-size: 36px;
-        font-weight: bold;
-        margin-bottom: 20px;
-    }
+.content-container h2 {
+    font-size: 66px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #FFD700;
+    
+}
+.content-container p {
+    color: #FFA07A;
+    font-size: 36px;
+    font
+}
 
 .cta-container {
     text-align: center;
     padding: 50px;
+    padding-left: 125px; 
 }
 
-    .cta-container h2 {
-        font-size: 48px;
-        font-weight: bold;
-        margin-bottom: 20px;
-    }
+.cta-container h2 {
+    font-size: 48px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: whitesmoke;
+}
 
 .cta-button {
     padding: 15px 30px;
@@ -104,9 +117,12 @@ section {
     transition: background-color 0.3s;
 }
 
-    .cta-button:hover {
-        background-color: #ed004e;
-    }
+.cta-button:hover {
+    background-color: #ed004e;
+    &:hover{
+               cursor: pointer;
+           }
+}
 
 /*login page*/
 .card {
@@ -117,18 +133,17 @@ section {
     background-color: #8adcff;
     border-color: darkgrey;
     color: black;
-    &:hover
-{
+    &:hover{
     background-color: #363bce;
     color: white;
-}
+    }
 }
 
 
 /*User Home Page*/
 /* Basic styling for the header strip */
 .header-user-hp {
-    background-color: rgba(229,217,159,0.55); 
+    background-color: rgba(198, 203, 239,0.55);
     height: 120px;
     width: 100%;
     display: flex;
@@ -140,13 +155,14 @@ section {
 /* Styling for the "Welcome" section on the left */
 .welcome-section {
     font-size: 40px;
+    font-weight:500;
     display: flex;
     align-items: center;
 }
 
 /* Styling for the user name on the left */
 .custom-link-button {
-    color: #0f84Af !important;
+    color: #a3edff !important;
     text-decoration: none !important;
 }
 #joinButton:hover, #createBoardButton:hover, #logoutButton:hover, #create_board_button:hover #join_board_button:hover {
@@ -213,8 +229,68 @@ section {
     color: #666;
     margin: 0;
 }
+/*The board display*/
+
+/* User homepage Board display */
+.outer-container {
+    width: 85%; /* Adjust the width as per your requirement */
+    background-color: #48759c;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.board-item-template {
+    margin-bottom: 20px;
+}
+
+.individual-covering {
+    background-color: #9bb5cc;
+    border-radius: 10px;
+    padding: 20px;
+    width: 60%;
+    height: 400px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+    .individual-covering:hover {
+        box-shadow: 0 2px 5px rgba(1, 1, 1, 1);
+    }
+
+.circle-board {
+    width: 300px;
+    height: 300px;
+    background-color: #a3edff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+    .circle-board:hover {
+        text-shadow: 5px 5px 2px rgba(0, 0, 0, 0.1);
+    }
+
+.board-name {
+    color: #FFFFFF;
+    font-weight: bold;
+    font-size: 30px;
+    text-align: center;
+    text-decoration: none;
+}
+
+    .board-name:hover {
+        color: cornflowerblue;
+    }
+
+.message-section,
+.notification-section {
+    font-size: medium;
+}
 
 
+
+
+/*Join board*/
 
 
 .joinboard-container {
@@ -229,9 +305,10 @@ section {
 .form-container {
    
     border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 2px 10px rgba(255, 255, 255, 1);
     padding: 20px;
     width: 400px;
+    color: white;
    
 }
 
@@ -269,63 +346,9 @@ section {
 }
 
 
-/* User homepage Board display */
-.outer-container {
-    width: 85%; /* Adjust the width as per your requirement */
-    background-color: #9DC8BD;
-    border-radius: 10px;
-    padding: 20px;
-}
-
-.board-item-template {
-    margin-bottom: 20px;
-}
-
-.individual-covering {
-    background-color: #DFFFD0;
-    border-radius: 10px;
-    padding: 20px;
-    width: 60%;
-    height: 400px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-.individual-covering:hover {
-    box-shadow: 0 2px 5px rgba(1, 1, 1, 1);
-}
-
-.circle-board {
-    width: 300px; 
-    height: 300px;
-    background-color: #D6B4FC;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.circle-board:hover {
-    text-shadow: 5px 5px 2px rgba(0, 0, 0, 0.1);
-}
-
-.board-name {
-    color: #FFFFFF;
-    font-weight: bold;
-    font-size: 30px;
-    text-align: center;
-    text-decoration: none;
-}
-.board-name:hover {
-    color: cornflowerblue;
-}
-
-.message-section,
-.notification-section {
-    font-size: medium;
-}
-
-
 /*Board Page*/
 .header-board-hp {
-    background-color: rgba(229, 217, 159, 0.55);
+    background-color: rgba(198, 203, 239,0.55);
     height: 120px;
     width: 100%;
     display: flex;
@@ -362,9 +385,9 @@ section {
     padding: 10px 20px;
     cursor: pointer;
     font-size: 16px;
-}
-.add-statement-button:hover, .edit-statement-button:hover{
-    color: dodgerblue;
+    &:hover{
+               color: dodgerblue;
+           }
 }
 .fa-circle-left:hover{
    color: cornflowerblue; 
@@ -372,7 +395,6 @@ section {
 /*Display of the statements.*/
 .statement-container {
     background-color: transparent;
-    border: none;
     padding: 5px;
     margin: 20px;
 }
@@ -381,7 +403,7 @@ section {
 }
 
 .statement {
-    background-color: rgba(212, 175, 84, 0.2);
+    background-color: rgba(255, 255, 255, 0.8);
     border-radius: 10px;
     padding: 10px;
     margin-bottom: 10px;
@@ -391,7 +413,7 @@ section {
 }
 
 .statement-by {
-    background-color: #f1cbcc;
+    background-color: #8dcfd2;
     border: 1px solid #000;
     border-radius: 5px;
     padding: 10px;

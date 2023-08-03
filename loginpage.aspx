@@ -55,7 +55,7 @@
                </div>
             </div>
            
-            <a href="homepage.aspx"  style="text-decoration: none; color: inherit;" onmouseover="this.style.color='blue';" onmouseout="this.style.color='inherit';"><< Back to Home</a><br><br>
+            <a href="homepage.aspx"  style="text-decoration: none; color: white;" onmouseover="this.style.color='blue';" onmouseout="this.style.color='white';"><< Back to Home</a><br><br>
          </div>
       </div>
    </div>

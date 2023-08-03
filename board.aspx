@@ -15,8 +15,9 @@
             <asp:Button ID="addStatementButton" runat="server" CssClass="add-statement-button" Text="Add Statement" OnClientClick="event.preventDefault(); openAddStatementPopup();" />
         </div>
     </header>
-
-    <div>
+    <br />
+    <center>
+          <div class="outer-container">
         <asp:Repeater ID="statementRepeater" runat="server">
             <HeaderTemplate>
                 <div class="statement-container">
@@ -47,12 +48,16 @@
             </FooterTemplate>
         </asp:Repeater>
 
+
         <asp:Panel ID="noStatementsPanel" runat="server" Visible="false">
             <div class="no-statements-container">
                 No Statements on the Board. Click the Add button to write the first statement of the board.
             </div>
         </asp:Panel>
     </div>
+        </center>
+    <br />
+
 
     <!-- Add Statement Popup -->
     <div id="addStatementPopup" class="popup-container">
