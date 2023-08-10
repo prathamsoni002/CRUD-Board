@@ -196,7 +196,7 @@ section {
 
 
 
-/*Userhome page*/
+/*Userhome page - Board Containers*/
 .active-boards-container {
     display: flex;
     flex-wrap: wrap;
@@ -230,7 +230,6 @@ section {
     margin: 0;
 }
 /*The board display*/
-
 /* User homepage Board display */
 .outer-container {
     width: 85%; /* Adjust the width as per your requirement */
@@ -241,6 +240,7 @@ section {
 
 .board-item-template {
     margin-bottom: 20px;
+    position: relative;
 }
 
 .individual-covering {
@@ -250,11 +250,12 @@ section {
     width: 60%;
     height: 400px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
 }
 
-    .individual-covering:hover {
-        box-shadow: 0 2px 5px rgba(1, 1, 1, 1);
-    }
+.individual-covering:hover {
+    box-shadow: 0 2px 5px rgba(1, 1, 1, 1);
+}
 
 .circle-board {
     width: 300px;
@@ -266,9 +267,9 @@ section {
     align-items: center;
 }
 
-    .circle-board:hover {
-        text-shadow: 5px 5px 2px rgba(0, 0, 0, 0.1);
-    }
+.circle-board:hover {
+    text-shadow: 5px 5px 2px rgba(0, 0, 0, 0.1);
+}
 
 .board-name {
     color: #FFFFFF;
@@ -278,21 +279,53 @@ section {
     text-decoration: none;
 }
 
-    .board-name:hover {
-        color: cornflowerblue;
-    }
+.board-name:hover {
+    color: cornflowerblue;
+}
 
 .message-section,
 .notification-section {
     font-size: medium;
 }
+.leave-board-btn {
+    position: absolute;
+    top: 7px;
+    right: 20px;
+    font-size: 40px;
+    font-weight: 400;
+    color: black;
+    cursor: pointer;
+}
 
+.leave-board-btn:hover {
+    color: red;
+}
 
-
-
+/*Leave - Board Pop up*/
+.leaveBoard-statement-heading{
+    font-size: 40px;
+}
+#_boardname_{
+    color: black;
+}
+#leaveBoard-statement-content{
+    font-size: 20px;
+    font-weight: 400;
+    padding-bottom: 30px;
+}
+.button-container-uh{
+    padding-top: 80px;
+}
+#cancelBtn, .leaveBtn-button {
+    font-size: 20px;
+    background-color: #d3b754;
+    opacity: 0.8;
+    &:hover{
+        opacity: 1;
+        color: white;
+    }
+}
 /*Join board*/
-
-
 .joinboard-container {
     font-family: Arial, sans-serif;
     display: flex;
