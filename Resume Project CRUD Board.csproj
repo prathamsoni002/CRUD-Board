@@ -2300,7 +2300,17 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Codes\1_Master page\" />
+    <Folder Include="Codes\2_Home Page_Landing Page\" />
+    <Folder Include="Codes\3_Registration Page\" />
+    <Folder Include="Codes\4_Login Page\" />
+    <Folder Include="Codes\5_Userhomepage\" />
+    <Folder Include="Codes\6_Create Board Page\" />
+    <Folder Include="Codes\7_Join Board Page\" />
+    <Folder Include="Codes\8_Board specific page\" />
+    <Folder Include="Codes\9_User Information page\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

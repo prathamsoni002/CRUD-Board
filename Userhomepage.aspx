@@ -42,15 +42,17 @@
         <div class="board-item-template">
           <div class="individual-covering">
             <div class="circle-board">
-              <asp:LinkButton ID="boardNameLink" runat="server" CssClass="board-name" Text='<%# Eval("Board ID") %>' OnClick="boardNameLink_Click"></asp:LinkButton>
+              <asp:LinkButton ID="boardNameLink" runat="server" CssClass="board-name" Text='<%# Eval("Name") %>' OnClick="boardNameLink_Click"></asp:LinkButton>
             </div>
+              <%--
             <div class="message-section">
-              Members:&nbsp<%# Eval("memberNumber") %>
-            </div>
-            <div class="notification-section">
+                    Members:&nbsp<%# Eval("Members") %>
+                </div>
+              <div class="notification-section">
               Notifications:&nbsp<%# Eval("notifications") %>
-            </div>
-              <div class="leave-board-btn" onclick='showLeaveBoardConfirmationPopup("<%# Eval("Board ID") %>")'>
+            </div> --%>
+            
+              <div class="leave-board-btn" onclick='showLeaveBoardConfirmationPopup("<%# Eval("Name") %>")'>
                 X
             </div>
           </div>

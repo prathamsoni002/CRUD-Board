@@ -564,7 +564,19 @@ section {
 #addButton, #editButton {
     margin-top: 30px;
 }
+.popup-textarea {
+    width: 100%;
+    height: 285px; /* Adjust height as needed */
+    resize: none;
+    border: none;
+    overflow: auto;
+    font-family: inherit;
+    font-size: inherit;
+}
 
+.edit-statement-textarea {
+    height: 200px; /* Adjust height as needed */
+}
 
 /*Delete conformation POP up*/
 .popup-heading, .statement-description-heading, .update-history-heading {

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -13,14 +10,13 @@ namespace Resume_Project_CRUD_Board
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            /*if (!IsPostBack)
-            {*/
-            BindBoards();
-            username_link.Visible = true;
-            username_link.Text = Session["fname"].ToString();
-            //}
+            if (!IsPostBack)
+            {
+                BindBoards();
+                username_link.Visible = true;
+                username_link.Text = Session["fname"].ToString();
+            }
         }
-
 
         protected void joinButton_Click(object sender, EventArgs e)
         {
@@ -29,25 +25,22 @@ namespace Resume_Project_CRUD_Board
 
         protected void logoutButton_Click(object sender, EventArgs e)
         {
-            if (Page.IsPostBack)
+            try
             {
-                try
-                {
-                    // Clear session and redirect to login page
-                    Session.Abandon();
-                    Session.Clear();
-                    Response.Cookies.Clear();
-                    string script = "alert('Logged Out Successfully.'); ";
-                    ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
-                }
-                catch (Exception ex)
-                {
-                    string script = "alert('There was an Exception while logging out.'); ";
-                    ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
-                }
-
-                Response.Redirect("loginpage.aspx");
+                // Clear session and redirect to the login page
+                Session.Abandon();
+                Session.Clear();
+                Response.Cookies.Clear();
+                string script = "alert('Logged Out Successfully.'); ";
+                ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
             }
+            catch (Exception ex)
+            {
+                string script = "alert('There was an Exception while logging out.'); ";
+                ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
+            }
+
+            Response.Redirect("loginpage.aspx");
         }
 
         protected void createBoardButton_Click(object sender, EventArgs e)
@@ -62,15 +55,22 @@ namespace Resume_Project_CRUD_Board
 
         protected void BindBoards()
         {
-            // Get the board IDs and notifications for the current user from the user-specific table
-            string userTableName = "USER_" + Session["username"] + Session["password"] + "sabd";
+            // Get the board IDs for the current user from the UserBoard table
             string connectionString = "Data Source=.;Initial Catalog=CRUDBoardDB;Integrated Security=True";
-            string query = $"SELECT [Board ID], Notifications FROM {userTableName}";
+            string query = @"
+                SELECT UB.BoardID, B.Name, B.SecretKey
+                FROM UserBoard UB
+                INNER JOIN Board B ON UB.BoardID = B.BoardID
+                WHERE UB.UserID = @UserID
+                ORDER BY UB.JoinedAt DESC
+            ";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
+                    command.Parameters.AddWithValue("@UserID", Session["UserID"]);
+
                     connection.Open();
                     SqlDataReader reader = command.ExecuteReader();
 
@@ -78,23 +78,6 @@ namespace Resume_Project_CRUD_Board
                     {
                         DataTable dataTable = new DataTable();
                         dataTable.Load(reader);
-
-                        // Add the "MemberNumber" column if it doesn't exist
-                        if (!dataTable.Columns.Contains("MemberNumber"))
-                        {
-                            dataTable.Columns.Add("MemberNumber");
-                        }
-
-                        foreach (DataRow row in dataTable.Rows)
-                        {
-                            string boardID = row["Board ID"].ToString();
-                            string notifications = row["Notifications"].ToString();
-
-                            // Get the member number from the BoardDetailsDB table
-                            int memberNumber = GetMemberNumber(boardID);
-
-                            row["MemberNumber"] = memberNumber;
-                        }
 
                         boardRepeater.DataSource = dataTable;
                         boardRepeater.DataBind();
@@ -107,84 +90,45 @@ namespace Resume_Project_CRUD_Board
             }
         }
 
-
-        protected int GetMemberNumber(string boardID)
-        {
-            // Get the member number from the BoardDetailsDB table based on the board ID
-            string connectionString = "Data Source=.;Initial Catalog=CRUDBoardDB;Integrated Security=True";
-            string query = "SELECT Members FROM BoardDetailsDB WHERE Board_ID = @BoardID";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@BoardID", boardID);
-
-                    connection.Open();
-                    object result = command.ExecuteScalar();
-
-                    if (result != null && int.TryParse(result.ToString(), out int memberNumber))
-                    {
-                        return memberNumber;
-                    }
-                }
-            }
-
-            return 0; // Default member number if not found or an error occurred
-        }
-
         protected void boardNameLink_Click(object sender, EventArgs e)
         {
             LinkButton boardNameLink = (LinkButton)sender;
-            string boardID = boardNameLink.Text;
+            string boardName = boardNameLink.Text;
 
-            Response.Redirect($"board.aspx?boardID={boardID}");
+            Response.Redirect($"board.aspx?boardName={Server.UrlEncode(boardName)}");
         }
 
         protected void leaveBtn_Click(object sender, EventArgs e)
         {
             try
             {
-
-                // Get the board ID and secret key from the popup
-                string boardID = boardNameHiddenField.Value;
+                // Get the board name and secret key from the popup
+                string boardName = boardNameHiddenField.Value;
                 string secretKey = deleteBoardSecretKeyInput.Text.Trim();
 
-
-                // Check if the secret key matches the one in BoardDetailsDB table
-                bool isSecretKeyValid = CheckSecretKey(boardID, secretKey);
+                // Check if the secret key matches the one in the Board table
+                bool isSecretKeyValid = CheckSecretKey(boardName, secretKey);
 
                 if (isSecretKeyValid)
                 {
-                    // Get the member number for the board
-                    int memberNumber = GetMemberNumber(boardID);
+                    // Remove the user from the UserBoard table
+                    RemoveUserFromUserBoard(boardName);
 
-                    // If member number is 1, delete the entire board
-                    if (memberNumber == 1)
+                    // Get the member count for the board
+                    int memberCount = GetMemberCount(boardName);
+
+                    if (memberCount == 0)
                     {
-                        // Delete the board details from the user-specific table
-                        DeleteBoardFromUserTable(boardID);
+                        // Delete the board from the Board table if there are no members left
+                        DeleteBoard(boardName);
 
-                        // Delete the table for the board from the database
-                        string tableName = "BOARD_" + boardID + secretKey + "sabd";
-                        DeleteBoardTable(tableName);
-
-                        // Delete the row from BoardDetailsDB table
-                        DeleteBoardFromBoardDetailsDB(boardID);
-
-                        string successMessage = $"Successful Exit from {boardID}";
+                        string successMessage = $"Successfully left and deleted the board {boardName}";
                         string script = $"alert('{successMessage}'); window.location.href = 'Userhomepage.aspx';";
                         ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
                     }
                     else
                     {
-                        // Subtract 1 from the member number in BoardDetailsDB table
-                        UpdateMemberNumber(boardID, memberNumber - 1);
-
-                        // Delete the row from the user-specific table
-                        DeleteBoardFromUserTable(boardID);
-
-                        string successMessage = $"Successful Exit from {boardID}";
+                        string successMessage = $"Successfully left the board {boardName}";
                         string script = $"alert('{successMessage}'); window.location.href = 'Userhomepage.aspx';";
                         ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
                     }
@@ -198,23 +142,22 @@ namespace Resume_Project_CRUD_Board
             }
             catch (Exception ex)
             {
-                string errorMessage = "Exception while removing Board. Error: " +ex.Message;
+                string errorMessage = "Exception while leaving the board. Error: " + ex.Message;
                 string script = $"alert('{errorMessage}');";
                 ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
-                return;
             }
         }
 
-        private bool CheckSecretKey(string boardID, string secretKey)
+        private bool CheckSecretKey(string boardName, string secretKey)
         {
             string connectionString = "Data Source=.;Initial Catalog=CRUDBoardDB;Integrated Security=True";
-            string query = "SELECT 1 FROM BoardDetailsDB WHERE Board_ID = @BoardID AND Secret_Key = @SecretKey";
+            string query = "SELECT 1 FROM Board WHERE Name = @BoardName AND SecretKey = @SecretKey";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@BoardID", boardID);
+                    command.Parameters.AddWithValue("@BoardName", boardName);
                     command.Parameters.AddWithValue("@SecretKey", secretKey);
 
                     connection.Open();
@@ -230,17 +173,17 @@ namespace Resume_Project_CRUD_Board
             return false; // If secret key does not match
         }
 
-        private void DeleteBoardFromUserTable(string boardID)
+        private void RemoveUserFromUserBoard(string boardName)
         {
-            string userTableName = "USER_" + Session["username"] + Session["password"] + "sabd";
             string connectionString = "Data Source=.;Initial Catalog=CRUDBoardDB;Integrated Security=True";
-            string query = $"DELETE FROM {userTableName} WHERE [Board ID] = @BoardID";
+            string query = "DELETE FROM UserBoard WHERE UserID = @UserID AND BoardID = (SELECT BoardID FROM Board WHERE Name = @BoardName)";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@BoardID", boardID);
+                    command.Parameters.AddWithValue("@UserID", Session["UserID"]);
+                    command.Parameters.AddWithValue("@BoardName", boardName);
 
                     connection.Open();
                     command.ExecuteNonQuery();
@@ -248,52 +191,91 @@ namespace Resume_Project_CRUD_Board
             }
         }
 
-        private void DeleteBoardTable(string tableName)
+        private int GetMemberCount(string boardName)
         {
             string connectionString = "Data Source=.;Initial Catalog=CRUDBoardDB;Integrated Security=True";
-            string query = $"DROP TABLE {tableName}";
+            string query = @"
+                SELECT COUNT(*) AS MemberCount
+                FROM UserBoard
+                WHERE BoardID = (SELECT BoardID FROM Board WHERE Name = @BoardName)
+            ";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
+                    command.Parameters.AddWithValue("@BoardName", boardName);
+
                     connection.Open();
-                    command.ExecuteNonQuery();
+                    object result = command.ExecuteScalar();
+
+                    if (result != null && int.TryParse(result.ToString(), out int memberCount))
+                    {
+                        return memberCount;
+                    }
                 }
             }
-        }
 
-        private void DeleteBoardFromBoardDetailsDB(string boardID)
+            return 0; // Default member count if not found or an error occurred
+        }
+        private string GetBoardID(string boardName)
         {
             string connectionString = "Data Source=.;Initial Catalog=CRUDBoardDB;Integrated Security=True";
-            string query = $"DELETE FROM BoardDetailsDB WHERE Board_ID = @BoardID";
+            string query = "SELECT BoardID FROM Board WHERE Name = @BoardName";
+            string boardID = "";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@BoardID", boardID);
+                    command.Parameters.AddWithValue("@BoardName", boardName);
 
                     connection.Open();
-                    command.ExecuteNonQuery();
+                    object result = command.ExecuteScalar();
+
+                    if (result != null)
+                    {
+                        boardID = result.ToString();
+                    }
                 }
             }
-        }
 
-        private void UpdateMemberNumber(string boardID, int memberNumber)
+            return boardID;
+        }
+        private void DeleteBoard(string boardName)
         {
             string connectionString = "Data Source=.;Initial Catalog=CRUDBoardDB;Integrated Security=True";
-            string query = $"UPDATE BoardDetailsDB SET Members = @MemberNumber WHERE Board_ID = @BoardID";
+            string boardID = GetBoardID(boardName); // Get the BoardID
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@MemberNumber", memberNumber);
-                    command.Parameters.AddWithValue("@BoardID", boardID);
+                connection.Open();
+                SqlTransaction transaction = connection.BeginTransaction();
 
-                    connection.Open();
-                    command.ExecuteNonQuery();
+                try
+                {
+                    // Step 1: Delete all statements associated with the board
+                    string deleteStatementsQuery = "DELETE FROM Statement WHERE BoardID = @BoardID";
+                    using (SqlCommand deleteStatementsCommand = new SqlCommand(deleteStatementsQuery, connection, transaction))
+                    {
+                        deleteStatementsCommand.Parameters.AddWithValue("@BoardID", boardID);
+                        deleteStatementsCommand.ExecuteNonQuery();
+                    }
+
+                    // Step 2: Delete the board
+                    string deleteBoardQuery = "DELETE FROM Board WHERE BoardID = @BoardID";
+                    using (SqlCommand deleteBoardCommand = new SqlCommand(deleteBoardQuery, connection, transaction))
+                    {
+                        deleteBoardCommand.Parameters.AddWithValue("@BoardID", boardID);
+                        deleteBoardCommand.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    // Handle the exception (log, display error message, etc.)
                 }
             }
         }
@@ -302,7 +284,7 @@ namespace Resume_Project_CRUD_Board
 
         protected void cancelBtn_Click(object sender, EventArgs e)
         {
-
+            /*The decision to display an */
         }
     }
 }

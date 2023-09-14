@@ -30,15 +30,16 @@ namespace Resume_Project_CRUD_Board
                     SqlConnection con = new SqlConnection(strcon);
                     if (con.State == System.Data.ConnectionState.Closed) { con.Open(); }
 
-                    SqlCommand cmd = new SqlCommand("select * from user_information where User_Name='" + TextBox1.Text.Trim() + "' AND Password='" + TextBox2.Text.Trim() + "'", con);
+                    SqlCommand cmd = new SqlCommand("select * from Users where Username='" + TextBox1.Text.Trim() + "' AND Password='" + TextBox2.Text.Trim() + "'", con);
                     SqlDataReader dr = cmd.ExecuteReader();
                     if (dr.HasRows)
                     {
                         while (dr.Read())
                         {
-                            Session["username"] = dr.GetValue(3).ToString();
-                            Session["password"] = dr.GetValue(4).ToString();
-                            Session["fname"] = dr.GetValue(0).ToString();
+                            Session["username"] = dr.GetValue(4).ToString();
+                            Session["password"] = dr.GetValue(5).ToString();
+                            Session["fname"] = dr.GetValue(1).ToString();
+                            Session["userID"] = dr.GetValue(0).ToString();
                         }
                     }
                     else

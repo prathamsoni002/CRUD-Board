@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
-
 
 namespace Resume_Project_CRUD_Board
 {
@@ -20,17 +14,17 @@ namespace Resume_Project_CRUD_Board
         {
             if (!IsPostBack)
             {
-                if (Session["username"] != null)
+                if (Session["userID"] != null)
                 {
-                    // Get the user information from the database based on the session username
+                    // Get the user information from the database based on the session userID
                     string connectionString = "Data Source=.;Initial Catalog=CRUDBoardDB;Integrated Security=True";
-                    string query = "SELECT [Name], [Organization], [Department], [User_Name], [Password] FROM user_information WHERE [User_Name] = @UserName";
+                    string query = "SELECT [Name], [Organization], [Department], [Username] FROM Users WHERE [UserID] = @UserID";
 
                     using (SqlConnection connection = new SqlConnection(connectionString))
                     {
                         using (SqlCommand command = new SqlCommand(query, connection))
                         {
-                            command.Parameters.AddWithValue("@UserName", Session["username"].ToString());
+                            command.Parameters.AddWithValue("@UserID", Session["userID"].ToString());
 
                             connection.Open();
                             SqlDataReader reader = command.ExecuteReader();
@@ -45,8 +39,7 @@ namespace Resume_Project_CRUD_Board
                                 TextBox4.Text = originalName;
                                 TextBox5.Text = originalOrganization;
                                 TextBox3.Text = originalDepartment;
-                                TextBox1.Text = Session["username"].ToString();
-                                TextBox2.Text = "********"; // Or any placeholder for the password
+                                TextBox1.Text = reader["Username"].ToString();
                             }
                             else
                             {
@@ -58,7 +51,7 @@ namespace Resume_Project_CRUD_Board
                 }
                 else
                 {
-                    // Redirect to login page if session username is null
+                    // Redirect to login page if session userID is null
                     Response.Redirect("loginpage.aspx");
                 }
             }
@@ -91,7 +84,7 @@ namespace Resume_Project_CRUD_Board
                     {
                         // Update the user information in the database
                         string connectionString = "Data Source=.;Initial Catalog=CRUDBoardDB;Integrated Security=True";
-                        string query = "UPDATE user_information SET [Name] = @Name, [Organization] = @Organization, [Department] = @Department WHERE [User_Name] = @UserName";
+                        string query = "UPDATE Users SET [Name] = @Name, [Organization] = @Organization, [Department] = @Department WHERE [UserID] = @UserID";
 
                         using (SqlConnection connection = new SqlConnection(connectionString))
                         {
@@ -100,14 +93,23 @@ namespace Resume_Project_CRUD_Board
                                 command.Parameters.AddWithValue("@Name", name);
                                 command.Parameters.AddWithValue("@Organization", organization);
                                 command.Parameters.AddWithValue("@Department", department);
-                                command.Parameters.AddWithValue("@UserName", Session["username"].ToString());
+                                command.Parameters.AddWithValue("@UserID", Session["userID"].ToString());
 
                                 connection.Open();
                                 int rowsAffected = command.ExecuteNonQuery();
 
                                 if (rowsAffected > 0)
                                 {
-                                    // Show a success message and refresh the page
+                                    // Update the original values for future comparisons
+                                    originalName = name;
+                                    originalOrganization = organization;
+                                    originalDepartment = department;
+
+                                    // Update Session variables with new values
+                                    Session["username"] = TextBox1.Text;
+                                    Session["fname"] = name;
+
+                                    // Show a success message and redirect to userInformations.aspx
                                     ClientScript.RegisterStartupScript(this.GetType(), "alert", "alert('Updated successfully.'); window.location.href='userInformations.aspx';", true);
                                 }
                                 else
@@ -126,5 +128,6 @@ namespace Resume_Project_CRUD_Board
                 ClientScript.RegisterStartupScript(this.GetType(), "alert", "alert('An error occurred while updating.');", true);
             }
         }
+
     }
 }

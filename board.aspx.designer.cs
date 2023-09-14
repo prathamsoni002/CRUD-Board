@@ -103,5 +103,14 @@ namespace Resume_Project_CRUD_Board
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.HiddenField timestampHiddenField;
+
+        /// <summary>
+        /// statementIDHiddenField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField statementIDHiddenField;
     }
 }

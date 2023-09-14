@@ -43,6 +43,11 @@
                         <div class="form-group">
                            <asp:TextBox CssClass="form-control" ID="TextBox3" runat="server" placeholder="Ex. Product Manager"></asp:TextBox>
                         </div>
+
+                         <label>Email ID</label>
+                        <div class="form-group">
+                           <asp:TextBox CssClass="form-control" ID="TextBox6" runat="server" placeholder="email"></asp:TextBox>
+                        </div>
                          <div class="row">
                               <div class="col">
                          <br />

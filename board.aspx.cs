@@ -1,41 +1,52 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Data;
-using System.Linq;
-using System.Web;
+using System.Data.SqlClient;
 using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Globalization;
 
 namespace Resume_Project_CRUD_Board
 {
     public partial class board : System.Web.UI.Page
     {
-        string connectionString = "Data Source=.;Initial Catalog=CRUDBoardDB;Integrated Security=True";
+        private string connectionString = "Data Source=.;Initial Catalog=CRUDBoardDB;Integrated Security=True";
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
-                if (Request.QueryString["boardID"] != null)
+                if (Request.QueryString["boardName"] != null)
                 {
-                    string boardID = Request.QueryString["boardID"].ToString();
-                    boardIdLabel.Text = boardID;
+                    string boardName = Request.QueryString["boardName"].ToString();
+                    boardIdLabel.Text = boardName;
 
-                    BindStatements(boardID);
+                    BindStatements(boardName);
                 }
             }
         }
 
-        protected void BindStatements(string boardID)
+        protected void BindStatements(string boardName)
         {
-            string tableName = "BOARD_" + boardID + GetSecretKey(boardID) + "sabd";
-            string query = $"SELECT Statement, Details, StatementBy, Timestamp, updated_by FROM {tableName} ORDER BY Timestamp DESC";
+            string query = @"
+            SELECT 
+                S.StatementID, 
+                S.Title, 
+                S.Description, 
+                UC.Username as CreatedBy, 
+                UE.Username as UpdatedBy, 
+                S.CreatedAt, 
+                S.UpdatedAt
+            FROM Statement S
+            INNER JOIN Users UC ON S.CreatedBy = UC.UserID
+            LEFT JOIN Users UE ON S.UpdatedBy = UE.UserID
+            WHERE S.BoardID = (SELECT BoardID FROM Board WHERE Name = @BoardName)
+            ORDER BY S.CreatedAt DESC
+    ";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
+                    command.Parameters.AddWithValue("@BoardName", boardName);
+
                     connection.Open();
                     SqlDataReader reader = command.ExecuteReader();
 
@@ -55,112 +66,186 @@ namespace Resume_Project_CRUD_Board
             }
         }
 
-        protected string GetSecretKey(string boardID)
+
+
+        protected void addButton_Click(object sender, EventArgs e)
         {
-            string query = "SELECT Secret_Key FROM BoardDetailsDB WHERE Board_ID = @BoardID";
-            string secretKey = "";
+            try
+            {
+                string title = Request.Form["statementInput"];
+                string description = Request.Form["descriptionInput"];
+
+                if (title == "" || description == "")
+                {
+                    string script = "alert('The Statement or Description cannot be empty.'); ";
+                    ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
+                    return;
+                }
+
+                // Get the user's UserID from the session
+                if (Guid.TryParse(Session["userID"].ToString(), out Guid createdByUserID))
+                {
+                    string boardName = boardIdLabel.Text;
+                    string boardID = GetBoardID(boardName);
+
+                    // Generate a new GUID for the statement ID
+                    Guid statementID = Guid.NewGuid();
+
+                    string query = @"
+                INSERT INTO Statement (StatementID, BoardID, Title, Description, CreatedBy, CreatedAt, UpdatedAt)
+                VALUES (@StatementID, @BoardID, @Title, @Description, @CreatedBy, @CreatedAt, @UpdatedAt)
+            ";
+
+                    using (SqlConnection connection = new SqlConnection(connectionString))
+                    {
+                        using (SqlCommand command = new SqlCommand(query, connection))
+                        {
+                            command.Parameters.AddWithValue("@StatementID", statementID);
+                            command.Parameters.AddWithValue("@BoardID", boardID);
+                            command.Parameters.AddWithValue("@Title", title);
+                            command.Parameters.AddWithValue("@Description", description);
+                            command.Parameters.AddWithValue("@CreatedBy", createdByUserID);
+                            command.Parameters.AddWithValue("@CreatedAt", DateTime.Now);
+                            command.Parameters.AddWithValue("@UpdatedAt", DBNull.Value);
+
+                            connection.Open();
+                            command.ExecuteNonQuery();
+                        }
+                    }
+
+                    Response.Redirect(Request.RawUrl);
+                }
+                else
+                {
+                    string script = "alert('Invalid user ID.'); ";
+                    ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                string script = "alert('Exception while adding the statement.'); ";
+                ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
+                return;
+            }
+        }
+        
+        
+        protected void deleteYesButton_Click(object sender, EventArgs e)
+        {
+            string statementID = statementIDHiddenField.Value; // Use the function to get the statement ID
+
+            string query = "DELETE FROM Statement WHERE StatementID = @StatementID";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@BoardID", boardID);
+                    command.Parameters.AddWithValue("@StatementID", statementID);
+
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+
+            Response.Redirect(Request.RawUrl);
+        }
+
+        // Add a new method to get the username based on UserID
+        private string GetUsername(string userID)
+        {
+            string query = "SELECT Username FROM Users WHERE UserID = @UserID";
+            string username = "";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@UserID", userID);
 
                     connection.Open();
                     object result = command.ExecuteScalar();
 
                     if (result != null)
                     {
-                        secretKey = result.ToString();
+                        username = result.ToString();
                     }
                 }
             }
 
-            return secretKey;
-        }
-
-        protected void addButton_Click(object sender, EventArgs e)
-        {
-            string statement = Request.Form["statementInput"];
-            string description = Request.Form["descriptionInput"];
-            string statementID = Session["username"].ToString() + DateTime.Now.ToString("yyyyMMddHHmmss");
-            string statementBy = Session["username"].ToString();
-            DateTime timestamp = DateTime.Now;
-
-            string tableName = "BOARD_" + boardIdLabel.Text + GetSecretKey(boardIdLabel.Text) + "sabd";
-            string query = $"INSERT INTO {tableName} (StatementID, Statement, Details, StatementBy, Timestamp) VALUES (@StatementID, @Statement, @Details, @StatementBy, @Timestamp)";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@StatementID", statementID);
-                    command.Parameters.AddWithValue("@Statement", statement);
-                    command.Parameters.AddWithValue("@Details", description);
-                    command.Parameters.AddWithValue("@StatementBy", statementBy);
-                    command.Parameters.AddWithValue("@Timestamp", timestamp);
-
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-            }
-
-            Response.Redirect(Request.RawUrl);
-        }
-
-        protected void deleteYesButton_Click(object sender, EventArgs e)
-        {
-            string statementBy = statementByHiddenField.Value;
-            string timestamp = timestampHiddenField.Value;
-            DateTime dateTime = DateTime.ParseExact(timestamp, "dd-MM-yyyy HH:mm:ss", CultureInfo.InvariantCulture);
-            string formattedTimestamp = dateTime.ToString("yyyyMMddHHmmss");
-            string statementID = statementBy + formattedTimestamp;
-
-            string tableName = "BOARD_" + boardIdLabel.Text + GetSecretKey(boardIdLabel.Text) + "sabd";
-            string query = $"DELETE FROM {tableName} WHERE StatementID = @StatementID";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@StatementID", statementID);
-
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-            }
-
-            Response.Redirect(Request.RawUrl);
+            return username;
         }
 
         protected void editButton_Click(object sender, EventArgs e)
         {
-            string statement = Request.Form["editStatementInput"];
+            string statementID = statementIDHiddenField.Value;
+            string title = Request.Form["editStatementInput"];
             string description = Request.Form["editDescriptionInput"];
-            string statementBy = statementByHiddenField.Value;
-            string timestamp = timestampHiddenField.Value;
-            DateTime dateTime = DateTime.ParseExact(timestamp, "dd-MM-yyyy HH:mm:ss", CultureInfo.InvariantCulture);
-            string formattedTimestamp = dateTime.ToString("yyyyMMddHHmmss");
-            string statementID = statementBy + formattedTimestamp;
+            string updatedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-            string tableName = "BOARD_" + boardIdLabel.Text + GetSecretKey(boardIdLabel.Text) + "sabd";
-            string query = $"UPDATE {tableName} SET Statement = @Statement, Details = @Details, updated_by = @UpdatedBy WHERE StatementID = @StatementID";
+            if (title == "" || description == "")
+            {
+                string script = "alert('The Statement or Description cannot be empty.'); ";
+                ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
+                return;
+            }
+            // Get the current user's ID from the session
+            if (Guid.TryParse(Session["userID"].ToString(), out Guid updatedByUserID))
+            {
+                string query = @"
+            UPDATE Statement
+            SET Title = @Title, Description = @Description, UpdatedAt = @UpdatedAt, UpdatedBy = @UpdatedBy
+            WHERE StatementID = @StatementID
+        ";
+
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Title", title);
+                        command.Parameters.AddWithValue("@Description", description);
+                        command.Parameters.AddWithValue("@UpdatedAt", updatedAt);
+                        command.Parameters.AddWithValue("@UpdatedBy", updatedByUserID);
+                        command.Parameters.AddWithValue("@StatementID", statementID);
+
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                    }
+                }
+
+                Response.Redirect(Request.RawUrl);
+            }
+            else
+            {
+                string script = "alert('Invalid user ID.'); ";
+                ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
+                return;
+            }
+        }
+
+
+        private string GetBoardID(string boardName)
+        {
+            string query = "SELECT BoardID FROM Board WHERE Name = @BoardName";
+            string boardID = "";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@Statement", statement);
-                    command.Parameters.AddWithValue("@Details", description);
-                    command.Parameters.AddWithValue("@UpdatedBy", Session["username"].ToString() + " " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-                    command.Parameters.AddWithValue("@StatementID", statementID);
+                    command.Parameters.AddWithValue("@BoardName", boardName);
 
                     connection.Open();
-                    command.ExecuteNonQuery();
+                    object result = command.ExecuteScalar();
+
+                    if (result != null)
+                    {
+                        boardID = result.ToString();
+                    }
                 }
             }
 
-            Response.Redirect(Request.RawUrl);
+            return boardID;
         }
     }
 }

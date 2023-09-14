@@ -63,7 +63,7 @@ namespace Resume_Project_CRUD_Board
                 SqlConnection con = new SqlConnection(strcon);
                 if (con.State == System.Data.ConnectionState.Closed) { con.Open(); }
 
-                SqlCommand cmd = new SqlCommand("select * from BoardDetailsDB where Board_ID='" + TextBox1.Text.Trim() + "';", con);
+                SqlCommand cmd = new SqlCommand("select * from Board where Name='" + TextBox1.Text.Trim() + "';", con);
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
@@ -90,59 +90,64 @@ namespace Resume_Project_CRUD_Board
             }
         }
         //Creating Board
+        // Creating Board and adding the creator to UserBoard table
         void createNewBoard()
         {
-            log.Info("The code is entered the in the function to create new board.");
+            log.Info("The code is entered into the function to create a new board.");
             try
             {
-                if(TextBox2.Text.ToString() == TextBox3.Text.ToString())
+                if (TextBox2.Text.ToString() == TextBox3.Text.ToString())
                 {
-                    //Adding the Board Detains to BoardDetailsDB:
                     SqlConnection con = new SqlConnection(strcon);
                     if (con.State == System.Data.ConnectionState.Closed) { con.Open(); }
 
-                    SqlCommand cmd = new SqlCommand("insert into BoardDetailsDB (Board_ID, Secret_Key, Members) values(@boardID, @secretkey, 1)", con);
+                    // Get the user's UserID from the session
+                    if (Guid.TryParse(Session["userID"].ToString(), out Guid createdByUserID))
+                    {
+                        // Generate a new GUID for the board ID
+                        Guid boardID = Guid.NewGuid();
 
-                    cmd.Parameters.AddWithValue("@boardID", TextBox1.Text.ToString());
-                    cmd.Parameters.AddWithValue("@secretkey", TextBox3.Text.ToString());
+                        SqlCommand cmd = new SqlCommand("INSERT INTO Board (BoardID, Name, SecretKey, CreatedBy, CreatedAt, UpdatedAt) " +
+                                                        "VALUES (@boardID, @name, @secretKey, @createdBy, GETDATE(), GETDATE())", con);
 
-                    cmd.ExecuteNonQuery();
+                        cmd.Parameters.AddWithValue("@boardID", boardID);
+                        cmd.Parameters.AddWithValue("@name", TextBox1.Text.Trim());
+                        cmd.Parameters.AddWithValue("@secretKey", TextBox3.Text.Trim());
+                        cmd.Parameters.AddWithValue("@createdBy", createdByUserID);
 
-                    //adding details in the user sabd:
-                    string usersabd_table_name = "USER_"+ Session["username"].ToString() + Session["password"].ToString() + "sabd";
-                    string query = $"insert into [{usersabd_table_name}] ([Board ID], [Board Secret Key], Members, Notifications) values (@boardID, @secretkey, 0, 0)";
-                    SqlCommand userSabd = new SqlCommand(query, con);
+                        cmd.ExecuteNonQuery();
 
-                    userSabd.Parameters.AddWithValue("@boardID", TextBox1.Text.ToString());
-                    userSabd.Parameters.AddWithValue("@secretkey", TextBox3.Text.ToString());
+                        // Add the creator to the UserBoard table
+                        SqlCommand addUserToUserBoardCmd = new SqlCommand("INSERT INTO UserBoard (UserBoardID, UserID, BoardID, JoinedAt) VALUES (NEWID(), @userID, @boardID, GETDATE())", con);
+                        addUserToUserBoardCmd.Parameters.AddWithValue("@userID", createdByUserID);
+                        addUserToUserBoardCmd.Parameters.AddWithValue("@boardID", boardID);
 
-                    userSabd.ExecuteNonQuery();
+                        addUserToUserBoardCmd.ExecuteNonQuery();
 
-                    // Creating the Board Specific Active Board Details:
-                    string tableName = "BOARD_" + TextBox1.Text.ToString() + TextBox3.Text.ToString() + "sabd";
-                    SqlCommand createTableCmd = new SqlCommand($"CREATE TABLE {tableName} ([Statement] varchar(50) not null, [Details] varchar(1000) not null, StatementID varchar(30) not null, StatementBy varchar(60) not null, [Timestamp] datetime not null, [updated_by] varchar(255) null)", con);
-                    createTableCmd.ExecuteNonQuery();
-
-                    con.Close();
-
+                        // Close the connection after executing the queries
+                        con.Close();
+                    }
+                    else
+                    {
+                        string script = "alert('Invalid user ID.'); ";
+                        ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
+                        return;
+                    }
                 }
                 else
                 {
-                    string script = "alert('The Secret Keys do no match.'); ";
+                    string script = "alert('The Secret Keys do not match.'); ";
                     ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
                     return;
                 }
-
             }
             catch (Exception ex)
             {
                 string script = "alert('Exception while creating the Board.'); ";
                 ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
                 return;
-                //Response.Write("<script>alert('" + ex.Message + "');</script>");
             }
-
-
         }
+
     }
 }

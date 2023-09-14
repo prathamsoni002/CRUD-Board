@@ -1,7 +1,6 @@
 ﻿using CRUDBoadr_logs;
 using log4net;
 using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Data;
 using System.Linq;
@@ -14,17 +13,20 @@ namespace Resume_Project_CRUD_Board
     public partial class joinboard : System.Web.UI.Page
     {
         private static readonly ILog log = LoggerHelper.GetLogger();
-        string strcon = "Data Source=.;Initial Catalog = CRUDBoardDB; Integrated Security = True";
+        string strcon = "Data Source=.;Initial Catalog=CRUDBoardDB;Integrated Security=True";
+
         protected void Page_Load(object sender, EventArgs e)
         {
             join_board_button.Click += new EventHandler(join_board_button_Click);
         }
+
         protected override void Render(HtmlTextWriter writer)
         {
             ClientScriptManager cs = Page.ClientScript;
             cs.RegisterForEventValidation(join_board_button.UniqueID);
             base.Render(writer);
         }
+
         protected void join_board_button_Click(object sender, EventArgs e)
         {
             if (Page.IsPostBack)
@@ -33,21 +35,9 @@ namespace Resume_Project_CRUD_Board
                 {
                     if (checkBoardExists() && checkSecretKey())
                     {
-                        if (!checkAlreadyJoined())
-                        {
-                            joinNewBoard();
-                            string Message = TextBox1.Text.ToString() + " Joined successfully.";
-                            string script = "alert('" + Message + "'); ";
-                            ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
-                            return;
-                        }
-                        else
-                        {
-                            string script = "alert('You are already a member of this Board.'); ";
-                            ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
-                            return;
-                        }
-                            
+                        JoinNewBoard();
+                        
+                        return;
                     }
                     else
                     {
@@ -64,134 +54,145 @@ namespace Resume_Project_CRUD_Board
                 }
             }
         }
-        // Following are the two different code for checking Board existance and validating the password. This tow seperate functions could be merged into one single function also.
+
         bool checkBoardExists()
         {
             try
             {
-                SqlConnection con = new SqlConnection(strcon);
-                if (con.State == System.Data.ConnectionState.Closed) { con.Open(); }
-
-                SqlCommand cmd = new SqlCommand("select * from BoardDetailsDB where Board_ID='" + TextBox1.Text.Trim() + "';", con);
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-
-                if (dt.Rows.Count >= 1)
+                using (SqlConnection con = new SqlConnection(strcon))
                 {
-                    con.Close();
-                    return true;
-                }
-                else
-                {
-                    con.Close();
-                    return false;
-                }
+                    if (con.State == System.Data.ConnectionState.Closed) { con.Open(); }
 
+                    using (SqlCommand cmd = new SqlCommand("SELECT * FROM Board WHERE Name = @boardName", con))
+                    {
+                        cmd.Parameters.AddWithValue("@boardName", TextBox1.Text.Trim());
+                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                        {
+                            DataTable dt = new DataTable();
+                            da.Fill(dt);
 
+                            return dt.Rows.Count >= 1;
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
-                string script = "alert('Error While checking the existance of the board and the validity of the password.'); ";
+                string script = "alert('Error While checking the existence of the board and the validity of the password.'); ";
                 ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
                 return false;
-                //Response.Write("<script>alert('" + ex.Message + "');</script>");
             }
         }
+
         bool checkSecretKey()
         {
             try
             {
-                SqlConnection con = new SqlConnection(strcon);
-                if (con.State == System.Data.ConnectionState.Closed) { con.Open(); }
-
-                SqlCommand cmd = new SqlCommand("select * from BoardDetailsDB where Board_ID='" + TextBox1.Text.Trim() + "'AND Secret_Key='" + TextBox2.Text.Trim() + "'", con);
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-
-                if (dt.Rows.Count >= 1)
+                using (SqlConnection con = new SqlConnection(strcon))
                 {
-                    con.Close();
-                    return true;
-                }
-                else
-                {
-                    con.Close();
-                    return false;
-                }
+                    if (con.State == System.Data.ConnectionState.Closed) { con.Open(); }
 
+                    using (SqlCommand cmd = new SqlCommand("SELECT * FROM Board WHERE Name = @boardName AND SecretKey = @secretKey", con))
+                    {
+                        cmd.Parameters.AddWithValue("@boardName", TextBox1.Text.Trim());
+                        cmd.Parameters.AddWithValue("@secretKey", TextBox2.Text.Trim());
+                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                        {
+                            DataTable dt = new DataTable();
+                            da.Fill(dt);
 
+                            return dt.Rows.Count >= 1;
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
-                string script = "alert('Error While checking the existance of the board and the validity of the password1.'); ";
+                string script = "alert('Error While checking the existence of the board and the validity of the password.'); ";
                 ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
                 return false;
-                //Response.Write("<script>alert('" + ex.Message + "');</script>");
             }
         }
-        bool checkAlreadyJoined()
+
+        void JoinNewBoard()
         {
             try
             {
-                SqlConnection con = new SqlConnection(strcon);
-                if (con.State == System.Data.ConnectionState.Closed) { con.Open(); }
-
-                string usersabd_table_name = "USER_" + Session["username"].ToString() + Session["password"].ToString() + "sabd";
-                SqlCommand cmd = new SqlCommand($"select * from {usersabd_table_name} where [Board ID]='" + TextBox1.Text.Trim() + "'AND [Board Secret Key]='" + TextBox2.Text.Trim() + "'", con);
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-
-                if (dt.Rows.Count >= 1)
+                using (SqlConnection con = new SqlConnection(strcon))
                 {
-                    con.Close();
-                    return true;
-                }
-                else
-                {
-                    con.Close();
-                    return false;
+                    if (con.State == System.Data.ConnectionState.Closed) { con.Open(); }
+
+                    // Get the board name and secret key entered by the user in TextBox1 and TextBox2
+                    string boardName = TextBox1.Text.Trim();
+                    string secretKey = TextBox2.Text.Trim();
+
+                    // Assuming you have the user's UserID stored in a session variable named "userID"
+                    if (Guid.TryParse(Session["userID"].ToString(), out Guid userID))
+                    {
+                        // Step 1: Get the Board ID by Name
+                        using (SqlCommand getBoardIDCmd = new SqlCommand("SELECT BoardID FROM Board WHERE Name = @boardName", con))
+                        {
+                            getBoardIDCmd.Parameters.AddWithValue("@boardName", boardName);
+                            Guid boardID = (Guid)getBoardIDCmd.ExecuteScalar();
+
+                            if (boardID != Guid.Empty)
+                            {
+                                // Step 2: Check User Membership
+                                using (SqlCommand checkMembershipCmd = new SqlCommand("SELECT * FROM UserBoard WHERE UserID = @userID AND BoardID = @boardID", con))
+                                {
+                                    checkMembershipCmd.Parameters.AddWithValue("@userID", userID);
+                                    checkMembershipCmd.Parameters.AddWithValue("@boardID", boardID);
+
+                                    using (SqlDataAdapter da = new SqlDataAdapter(checkMembershipCmd))
+                                    {
+                                        DataTable dt = new DataTable();
+                                        da.Fill(dt);
+
+                                        if (dt.Rows.Count == 0)
+                                        {
+                                            // User is not a member of the board, so add them to the UserBoard table
+                                            using (SqlCommand addUserToBoardCmd = new SqlCommand("INSERT INTO UserBoard (UserBoardID, UserID, BoardID, JoinedAt) VALUES (@userBoardID, @userID, @boardID, GETDATE())", con))
+                                            {
+                                                addUserToBoardCmd.Parameters.AddWithValue("@userBoardID", Guid.NewGuid()); // Provide a new GUID for UserBoardID
+                                                addUserToBoardCmd.Parameters.AddWithValue("@userID", userID);
+                                                addUserToBoardCmd.Parameters.AddWithValue("@boardID", boardID);
+
+                                                addUserToBoardCmd.ExecuteNonQuery();
+                                            }
+                                            string Message = TextBox1.Text.ToString() + " Joined successfully.";
+                                            string script = "alert('" + Message + "'); ";
+                                            ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
+                                        }
+                                        else
+                                        {
+                                            string script = "alert('You are Already member of this Board.'); ";
+                                            ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // Handle the case where the board name does not exist
+                                string script = "alert('Board does not exist.'); ";
+                                ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Handle the case where Session["userID"] cannot be parsed into a Guid
+                        string script = "alert('Invalid user ID.'); ";
+                        ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
+                    }
                 }
             }
             catch (Exception ex)
             {
-                string script = "alert('Error While checking wether the Board already Joined or not by the user.'); ";
+                string script = "alert('Exception in joining the board.'); ";
                 ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
-                return true;
-                //Response.Write("<script>alert('" + ex.Message + "');</script>");
             }
-        }
-        void joinNewBoard()
-        {
-            log.Info("The code is entered the in the function to join new board.");
-            try
-            {
-                SqlConnection con = new SqlConnection(strcon);
-                if (con.State == System.Data.ConnectionState.Closed) { con.Open(); }
-
-                string usersabd_table_name = "USER_" + Session["username"].ToString() + Session["password"].ToString() + "sabd";
-                string query = $"insert into [{usersabd_table_name}] ([Board ID], [Board Secret Key], Members, Notifications) values (@boardID, @secretkey, 0, 0)";
-                SqlCommand userSabd = new SqlCommand(query, con);
-
-                userSabd.Parameters.AddWithValue("@boardID", TextBox1.Text.ToString());
-                userSabd.Parameters.AddWithValue("@secretkey", TextBox2.Text.ToString());
-
-                userSabd.ExecuteNonQuery();
-
-                SqlCommand members_update = new SqlCommand($"UPDATE BoardDetailsDB SET Members = Members + 1 WHERE Board_ID= '{TextBox1.Text.ToString()}'", con);
-                members_update.ExecuteNonQuery();
-                con.Close();
-            }
-            catch (Exception ex)
-            {
-                string script = "alert('Exception in the BoardID and Password validating Function for the given Board details.'); ";
-                ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
-                return;
-                //Response.Write("<script>alert('" + ex.Message + "');</script>");
-            }
-
         }
     }
 }

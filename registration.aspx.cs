@@ -32,7 +32,7 @@ namespace Resume_Project_CRUD_Board
                 {
                     if (checkMemberExists())
                     {
-                        string script = "alert('Username is already taken.'); ";
+                        string script = "alert('It seems the Email or Username provided is already regestered please try another.'); ";
                         ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
                         return;
                     }
@@ -67,7 +67,9 @@ namespace Resume_Project_CRUD_Board
                 SqlConnection con = new SqlConnection(strcon);
                 if (con.State == System.Data.ConnectionState.Closed) { con.Open(); }
 
-                SqlCommand cmd = new SqlCommand("select * from user_information where User_Name='" + TextBox1.Text.Trim() + "';", con);
+                SqlCommand cmd = new SqlCommand("SELECT * FROM Users WHERE Username=@username OR EmailID=@email", con);
+                cmd.Parameters.AddWithValue("@username", TextBox1.Text.Trim());
+                cmd.Parameters.AddWithValue("@email", TextBox6.Text.Trim());
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
@@ -101,20 +103,17 @@ namespace Resume_Project_CRUD_Board
                 SqlConnection con = new SqlConnection(strcon);
                 if (con.State == System.Data.ConnectionState.Closed) { con.Open(); }
 
-                SqlCommand cmd = new SqlCommand("insert into user_information (Name, Organization, Department, User_Name, Password) values(@fname, @orgz, @depart, @username, @pass)", con);
+                SqlCommand cmd = new SqlCommand("INSERT INTO Users (UserID, Name, Organization, Department, Username, Password, EmailID, CreatedAt, UpdatedAt) " +
+                                "VALUES (NEWID(), @fname, @orgz, @depart, @username, @pass, @email, GETDATE(), GETDATE())", con);
 
                 cmd.Parameters.AddWithValue("@fname", TextBox4.Text.ToString());
                 cmd.Parameters.AddWithValue("@orgz", TextBox5.Text.ToString());
                 cmd.Parameters.AddWithValue("@depart", TextBox3.Text.ToString());
                 cmd.Parameters.AddWithValue("@username", TextBox1.Text.ToString());
                 cmd.Parameters.AddWithValue("@pass", TextBox2.Text.ToString());
+                cmd.Parameters.AddWithValue("@email", TextBox6.Text.ToString());
 
                 cmd.ExecuteNonQuery();
-
-                // Creating the User Specific Active Board Details
-                string tableName = "USER_"+ TextBox1.Text.ToString() + TextBox2.Text.ToString() + "sabd";
-                SqlCommand createTableCmd = new SqlCommand($"CREATE TABLE {tableName} ([Board ID] varchar(30) not null, [Board Secret Key] varchar(30) not null, Members int null, Notifications int null)", con);
-                createTableCmd.ExecuteNonQuery();
 
                 con.Close();
 
