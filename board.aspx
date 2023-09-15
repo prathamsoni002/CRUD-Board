@@ -38,11 +38,10 @@
                             <i class="fa-sharp fa-solid fa-pen-to-square fa-2xl" onclick='openEditStatementPopup("<%# Eval("Title") %>","<%# Eval("Description") %>","<%# Eval("CreatedBy") %>","<%# Eval("CreatedAt") %>","<%# Eval("StatementID") %>")'></i>
                             &nbsp;&nbsp;&nbsp;
                         </span>
-                      <span onclick='openshowUpdatePopup("<%# Eval("UpdatedBy") %>","<%# Eval("UpdatedAt") %>")'>
-                    <%# Eval("UpdatedBy") != DBNull.Value ? "<span class='updated-by'>" + "Updated By: " + Eval("UpdatedBy") + "</span><br/>" : "" %>
-                    <%# Eval("UpdatedAt") != DBNull.Value ? "<span class='updated-at'>" + "Updated At: " + Eval("UpdatedAt") + "</span>" : "" %>
-                </span>
-
+                        <span onclick='openshowUpdatePopup("<%# Eval("UpdatedBy") %>","<%# Eval("UpdatedAt") %>")'>
+                            <%# Eval("UpdatedBy") != DBNull.Value ? "<span class='updated-by'>" + "Updated By: " + Eval("UpdatedBy") + "</span><br/>" : "" %>
+                            <%# Eval("UpdatedAt") != DBNull.Value ? "<span class='updated-at'>" + "Updated At: " + Eval("UpdatedAt") + "</span>" : "" %>
+                        </span>
                     </div>
                 </ItemTemplate>
                 <FooterTemplate>
@@ -125,6 +124,7 @@
     <asp:HiddenField ID="statementByHiddenField" runat="server" />
     <asp:HiddenField ID="timestampHiddenField" runat="server" />
     <asp:HiddenField ID="statementIDHiddenField" runat="server" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.2.0/js/all.min.js"></script>
     <script>
         // Open the Add Statement Popup
         function openAddStatementPopup() {
@@ -170,10 +170,10 @@
             statementHiddenField.value = statement;
 
             var statementByHiddenField = document.getElementById('<%= statementByHiddenField.ClientID %>');
-    statementByHiddenField.value = statementBy;
+            statementByHiddenField.value = statementBy;
 
-    var timestampHiddenField = document.getElementById('<%= timestampHiddenField.ClientID %>');
-    timestampHiddenField.value = timestamp;
+            var timestampHiddenField = document.getElementById('<%= timestampHiddenField.ClientID %>');
+            timestampHiddenField.value = timestamp;
 
             var statementIDHiddenField = document.getElementById('<%= statementIDHiddenField.ClientID %>');
             statementIDHiddenField.value = statementID;
@@ -226,10 +226,10 @@
             statementHiddenField.value = statement;
 
             var statementByHiddenField = document.getElementById('<%= statementByHiddenField.ClientID %>');
-    statementByHiddenField.value = statementBy;
+            statementByHiddenField.value = statementBy;
 
-    var timestampHiddenField = document.getElementById('<%= timestampHiddenField.ClientID %>');
-    timestampHiddenField.value = timestamp;
+            var timestampHiddenField = document.getElementById('<%= timestampHiddenField.ClientID %>');
+            timestampHiddenField.value = timestamp;
 
             var statementIDHiddenField = document.getElementById('<%= statementIDHiddenField.ClientID %>');
             statementIDHiddenField.value = statementID;

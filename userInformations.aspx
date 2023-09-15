@@ -31,15 +31,15 @@
                                 <div class="col">
                                     <label>Name</label>
                                     <div class="form-group">
-                                        <asp:TextBox CssClass="form-control" ID="TextBox4" runat="server" ></asp:TextBox>
+                                        <asp:TextBox CssClass="form-control" ID="TextBox4" runat="server"></asp:TextBox>
                                     </div>
                                     <label>Organization</label>
                                     <div class="form-group">
-                                        <asp:TextBox CssClass="form-control" ID="TextBox5" runat="server" ></asp:TextBox>
+                                        <asp:TextBox CssClass="form-control" ID="TextBox5" runat="server"></asp:TextBox>
                                     </div>
                                     <label>Department</label>
                                     <div class="form-group">
-                                        <asp:TextBox CssClass="form-control" ID="TextBox3" runat="server" ></asp:TextBox>
+                                        <asp:TextBox CssClass="form-control" ID="TextBox3" runat="server"></asp:TextBox>
                                     </div>
                                     <div class="row">
                                         <div class="col">

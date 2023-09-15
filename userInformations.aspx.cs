@@ -6,6 +6,12 @@ namespace Resume_Project_CRUD_Board
 {
     public partial class userInformations : Page
     {
+        // Extracted the connection string into a separate method for reusability
+        private string GetConnectionString()
+        {
+            return "Data Source=.;Initial Catalog=CRUDBoardDB;Integrated Security=True";
+        }
+
         private string originalName;
         private string originalOrganization;
         private string originalDepartment;
@@ -16,11 +22,9 @@ namespace Resume_Project_CRUD_Board
             {
                 if (Session["userID"] != null)
                 {
-                    // Get the user information from the database based on the session userID
-                    string connectionString = "Data Source=.;Initial Catalog=CRUDBoardDB;Integrated Security=True";
                     string query = "SELECT [Name], [Organization], [Department], [Username] FROM Users WHERE [UserID] = @UserID";
 
-                    using (SqlConnection connection = new SqlConnection(connectionString))
+                    using (SqlConnection connection = new SqlConnection(GetConnectionString()))
                     {
                         using (SqlCommand command = new SqlCommand(query, connection))
                         {
@@ -83,10 +87,9 @@ namespace Resume_Project_CRUD_Board
                     else
                     {
                         // Update the user information in the database
-                        string connectionString = "Data Source=.;Initial Catalog=CRUDBoardDB;Integrated Security=True";
                         string query = "UPDATE Users SET [Name] = @Name, [Organization] = @Organization, [Department] = @Department WHERE [UserID] = @UserID";
 
-                        using (SqlConnection connection = new SqlConnection(connectionString))
+                        using (SqlConnection connection = new SqlConnection(GetConnectionString()))
                         {
                             using (SqlCommand command = new SqlCommand(query, connection))
                             {
@@ -128,6 +131,5 @@ namespace Resume_Project_CRUD_Board
                 ClientScript.RegisterStartupScript(this.GetType(), "alert", "alert('An error occurred while updating.');", true);
             }
         }
-
     }
 }

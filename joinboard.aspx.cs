@@ -36,7 +36,7 @@ namespace Resume_Project_CRUD_Board
                     if (checkBoardExists() && checkSecretKey())
                     {
                         JoinNewBoard();
-                        
+
                         return;
                     }
                     else

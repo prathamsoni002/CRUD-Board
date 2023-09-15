@@ -1,14 +1,9 @@
 ﻿using CRUDBoadr_logs;
 using log4net;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
-using System.Web.Services.Description;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 
 namespace Resume_Project_CRUD_Board
 {
@@ -16,16 +11,19 @@ namespace Resume_Project_CRUD_Board
     {
         private static readonly ILog log = LoggerHelper.GetLogger();
         string strcon = "Data Source=.;Initial Catalog = CRUDBoardDB; Integrated Security = True";
+
         protected void Page_Load(object sender, EventArgs e)
         {
             create_board_button.Click += new EventHandler(create_board_button_Click);
         }
+
         protected override void Render(HtmlTextWriter writer)
         {
             ClientScriptManager cs = Page.ClientScript;
             cs.RegisterForEventValidation(create_board_button.UniqueID);
             base.Render(writer);
         }
+
         protected void create_board_button_Click(object sender, EventArgs e)
         {
             if (Page.IsPostBack)
@@ -36,25 +34,23 @@ namespace Resume_Project_CRUD_Board
                     {
                         createNewBoard();
                         string Message = TextBox1.Text.ToString() + " created successfully.";
-                        string script = "alert('"+Message+"'); ";
+                        string script = "alert('" + Message + "'); ";
                         ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
-                        return;
                     }
                     else
                     {
-                       string script = "alert('Board with the same Board ID exists already. Please choose another ID.'); ";
+                        string script = "alert('Board with the same Board ID exists already. Please choose another ID.'); ";
                         ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
-                        return;
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
                     string script = "alert('Error in 'MainFunction' while creating the Board.'); ";
                     ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
-                    return;
                 }
             }
         }
+
         //Check if the board exists:
         bool checkBoardExists()
         {
@@ -78,18 +74,15 @@ namespace Resume_Project_CRUD_Board
                     con.Close();
                     return false;
                 }
-
-
             }
             catch (Exception ex)
             {
-                string script = "alert('Error While checking the existance of the board.'); ";
+                string script = "alert('Error While checking the existence of the board.'); ";
                 ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
                 return false;
-                //Response.Write("<script>alert('" + ex.Message + "');</script>");
             }
         }
-        //Creating Board
+
         // Creating Board and adding the creator to UserBoard table
         void createNewBoard()
         {
@@ -148,6 +141,5 @@ namespace Resume_Project_CRUD_Board
                 return;
             }
         }
-
     }
 }

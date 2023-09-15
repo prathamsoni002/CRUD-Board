@@ -66,8 +66,6 @@ namespace Resume_Project_CRUD_Board
             }
         }
 
-
-
         protected void addButton_Click(object sender, EventArgs e)
         {
             try
@@ -129,8 +127,7 @@ namespace Resume_Project_CRUD_Board
                 return;
             }
         }
-        
-        
+
         protected void deleteYesButton_Click(object sender, EventArgs e)
         {
             string statementID = statementIDHiddenField.Value; // Use the function to get the statement ID
@@ -222,7 +219,6 @@ namespace Resume_Project_CRUD_Board
                 return;
             }
         }
-
 
         private string GetBoardID(string boardName)
         {
